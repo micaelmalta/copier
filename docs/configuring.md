@@ -1477,6 +1477,33 @@ other items not present.
     your task manager. But it's just an example. The point is that we're showing
     how to build and call commands.
 
+### `post_render_template`
+
+-   Format: `List[str|List[str]|dict]`
+-   CLI flags: N/A
+-   Default value: `[]`
+
+Commands to execute after generating each file and before validating any conflict
+
+If a `dict` is given it can contain the following items:
+
+-   **command**: The task command to run.
+
+If a `str` or `List[str]` is given as a task it will be treated as `command` with all
+other items not presenta.
+
+!!! example
+
+    ```yaml title="copier.yml"
+    _post_render_template:
+        # Strings get executed under system's default shell
+        - ruff check --fix .
+    ```
+
+    Note: the example assumes you use [Invoke](https://www.pyinvoke.org/) as
+    your task manager. But it's just an example. The point is that we're showing
+    how to build and call commands.
+
 ### `templates_suffix`
 
 -   Format: `str`

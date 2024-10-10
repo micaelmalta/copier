@@ -524,6 +524,14 @@ class Template:
         return tasks
 
     @cached_property
+    def post_render_template(self) -> Sequence[str]:
+        """Get post-render template defined in the template.
+
+        See [post_render_template][].
+        """
+        return self.config_data.get("post_render_template", [])
+
+    @cached_property
     def templates_suffix(self) -> str:
         """Get the suffix defined for templates.
 

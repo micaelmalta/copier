@@ -627,6 +627,10 @@ class Worker:
                 new_content = tpl.render(**self._render_context()).encode()
         else:
             new_content = src_abspath.read_bytes()
+
+        # POST RENDER TEMPLATE HOOK
+        new_content = self._post_render_template(new_content)
+
         dst_abspath = Path(self.subproject.local_abspath, dst_relpath)
         src_mode = src_abspath.stat().st_mode
         if not self._render_allowed(dst_relpath, expected_contents=new_content):
@@ -1156,6 +1160,19 @@ class Worker:
             "--no-gpg-sign",
             "--no-verify",
         )
+
+    def _post_render_template(self, new_content: bytes) -> bytes:
+        for post_render_template in self.template.post_render_template:
+            # write a temp file and apply command
+            with TemporaryDirectory() as temp_dir:
+                temp_file = Path(temp_dir) / "temp"
+                temp_file.write_bytes(new_content)
+                post_render_template = self.jinja_env.from_string(post_render_template)
+                command = post_render_template.render(file=temp_file)
+                subprocess.run(command, shell=True, check=True)
+                new_content = temp_file.read_bytes()
+
+        return new_content
 
 
 def run_copy(
